@@ -4,7 +4,7 @@ public class Program
 {
     public static void Main()
     {
-        Window gameWindow = new Window("Car Racing Game", 800, 600);
+        Window gameWindow = new Window("Car Racing Game", 840, 650);
         CarRacing game = new CarRacing(gameWindow);
 
         while (!game.Quit() && !game.IsGameOver())

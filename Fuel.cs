@@ -3,22 +3,27 @@ using SplashKitSDK;
 public class Fuel
 {
     private Bitmap _fuelBitmap;
-    private double _x, _y;
-    private int _width, _height;
+    private int _x, _y;
+    private Window _gameWindow;
 
     public Fuel(Window gameWindow)
     {
-        _fuelBitmap = new Bitmap("fuel", "fuel.png");
-        _x = SplashKit.Rnd(gameWindow.Width - _fuelBitmap.Width);
-        _y = 0;
-        _width = _fuelBitmap.Width;
-        _height = _fuelBitmap.Height;
+        _gameWindow = gameWindow;
+        _fuelBitmap = new Bitmap("Fuel", "fuel.png");
+        Random rnd = new Random();
+        _x = rnd.Next(200, gameWindow.Width - _fuelBitmap.Width - 200);
+        _y = -_fuelBitmap.Height;
     }
 
     public void Update()
     {
-        _y += 3; // Move down
-        if (_y > SplashKit.ScreenHeight()) _y = -_height; // Reset to top
+        _y += 5;
+        if (_y > _gameWindow.Height)
+        {
+            _y = -_fuelBitmap.Height;
+            Random rnd = new Random();
+            _x = rnd.Next(200, _gameWindow.Width - _fuelBitmap.Width - 200);
+        }
     }
 
     public void Draw()
@@ -26,7 +31,7 @@ public class Fuel
         SplashKit.DrawBitmap(_fuelBitmap, _x, _y);
     }
 
-    public Bitmap FuelBitmap { get { return _fuelBitmap; } }
-    public double X { get { return _x; } }
-    public double Y { get { return _y; } }
+    public Bitmap Bitmap => _fuelBitmap;
+    public int X => _x;
+    public int Y => _y;
 }

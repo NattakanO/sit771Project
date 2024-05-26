@@ -2,31 +2,44 @@ using SplashKitSDK;
 
 public class ObstacleCar
 {
-    private Bitmap _carBitmap;
-    private double _x, _y;
-    private int _width, _height;
+    private Bitmap _obstacleBitmap;
+    private int _x, _y;//position of car
+    private Window _gameWindow;
+    public int X => _x;
+    public int Y => _y;
+    private int _speed = 1;
 
     public ObstacleCar(Window gameWindow)
     {
-        _carBitmap = new Bitmap("obstacle_car", "obstacle_car.png");
-        _x = SplashKit.Rnd(gameWindow.Width - _carBitmap.Width);
-        _y = 0;
-        _width = _carBitmap.Width;
-        _height = _carBitmap.Height;
+        _gameWindow = gameWindow;
+        _obstacleBitmap = new Bitmap("ObstacleCar", "obstacle_car.png");
+        Random rnd = new Random();
+        _x = rnd.Next(200, gameWindow.Width - _obstacleBitmap.Width - 200);
+        _y = -_obstacleBitmap.Height;
+    }
+
+    public int Speed {
+        get{ return _speed;}
+        set{ _speed = value;}
     }
 
     public void Update()
     {
-        _y += 5; 
-        if (_y > SplashKit.ScreenHeight()) _y = -_height; 
+        _y += _speed;
+        if (_y > _gameWindow.Height)
+        {
+            _y = -_obstacleBitmap.Height;
+            Random rnd = new Random();
+            _x = rnd.Next(200, _gameWindow.Width - _obstacleBitmap.Width-200);
+        }
     }
 
     public void Draw()
     {
-        SplashKit.DrawBitmap(_carBitmap, _x, _y);
+        SplashKit.DrawBitmap(_obstacleBitmap, _x, _y);
     }
 
-    public Bitmap CarBitmap { get { return _carBitmap; } }
-    public double X { get { return _x; } }
-    public double Y { get { return _y; } }
+    public Bitmap Bitmap => _obstacleBitmap;
+    
 }
+

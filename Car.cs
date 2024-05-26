@@ -3,39 +3,40 @@ using SplashKitSDK;
 public class Car
 {
     private Bitmap _carBitmap;
-    private double _x, _y;
-    private int _width, _height;
+    private Window _gameWindow;
+    private int _x, _y;
     private int _fuel;
-    private bool _quit;
-    private int _score;
 
     public Car(Window gameWindow)
     {
-        _carBitmap = new Bitmap("car", "car.png");
-        _x = gameWindow.Width / 2 - _carBitmap.Width / 2;
+        _gameWindow = gameWindow;
+        _carBitmap = new Bitmap("Car", "car.png");
+        _x = (gameWindow.Width - _carBitmap.Width) / 2;
         _y = gameWindow.Height - _carBitmap.Height - 10;
-        _width = _carBitmap.Width;
-        _height = _carBitmap.Height;
         _fuel = 100;
-        _quit = false;
-        _score = 0;
     }
 
+    public int Fuel{
+        get {return _fuel;}
+        set {_fuel = value;}
+    }
     public void HandleInput()
     {
-        if (SplashKit.KeyDown(KeyCode.LeftKey)) _x -= 5;
-        if (SplashKit.KeyDown(KeyCode.RightKey)) _x += 5;
-        if (SplashKit.KeyDown(KeyCode.UpKey)) _y -= 5;
-        if (SplashKit.KeyDown(KeyCode.DownKey)) _y += 5;
-        if (SplashKit.KeyDown(KeyCode.EscapeKey)) _quit = true;
+        if (SplashKit.KeyDown(KeyCode.LeftKey) && _x > 0)
+        {
+            _x -= 5;
+        }
+        if (SplashKit.KeyDown(KeyCode.RightKey) && _x < _gameWindow.Width - _carBitmap.Width)
+        {
+            _x += 5;
+        }
+        // if (SplashKit.KeyDown(KeyCode.EscapeKey)) _quit = true;
     }
 
     public void StayOnWindow(Window gameWindow)
     {
-        if (_x < 0) _x = 0;
-        if (_x + _width > gameWindow.Width) _x = gameWindow.Width - _width;
-        if (_y < 0) _y = 0;
-        if (_y + _height > gameWindow.Height) _y = gameWindow.Height - _height;
+        if (_x < 180) _x = 180;
+        if (_x > gameWindow.Width - _carBitmap.Width - 180) _x = gameWindow.Width - _carBitmap.Width - 180;
     }
 
     public void Draw()
@@ -45,14 +46,21 @@ public class Car
 
     public bool CollidedWithCar(ObstacleCar obstacle)
     {
-        return SplashKit.BitmapCollision(_carBitmap, _x, _y, obstacle.CarBitmap, obstacle.X, obstacle.Y);
+        return _carBitmap.BitmapCollision(_x, _y, obstacle.Bitmap, obstacle.X, obstacle.Y);
     }
 
     public bool CollidedWithFuel(Fuel fuel)
     {
-        return SplashKit.BitmapCollision(_carBitmap, _x, _y, fuel.FuelBitmap, fuel.X, fuel.Y);
+        return _carBitmap.BitmapCollision(_x, _y, fuel.Bitmap, fuel.X, fuel.Y);
     }
 
-    public bool Quit() { return _quit; }
-    public void Refuel() { _fuel += 10; }
+    public void Refuel()
+    {
+        _fuel += 10;
+    }
+
+    public bool Quit()
+    {
+        return SplashKit.KeyDown(KeyCode.EscapeKey);
+    }
 }
