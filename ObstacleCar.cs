@@ -8,12 +8,13 @@ public class ObstacleCar
     public int X => _x;
     public int Y => _y;
     private int _speed = 1;
+    private static Random rnd = new Random();
 
     public ObstacleCar(Window gameWindow)
     {
         _gameWindow = gameWindow;
-        _obstacleBitmap = new Bitmap("ObstacleCar", "obstacle_car.png");
-        Random rnd = new Random();
+        RandomColor();
+        // Random rnd = new Random();
         _x = rnd.Next(200, gameWindow.Width - _obstacleBitmap.Width - 200);
         _y = -_obstacleBitmap.Height;
     }
@@ -22,14 +23,34 @@ public class ObstacleCar
         get{ return _speed;}
         set{ _speed = value;}
     }
-
+    public void RandomColor(){
+        //  Random rnd = new Random();
+         
+         int num = rnd.Next(1, 4);
+         Console.WriteLine(num);
+        switch (num)
+        {
+            case 1:
+                _obstacleBitmap = new Bitmap("ObstacleCar", "o_car1.png");
+                break;
+            case 2:
+                _obstacleBitmap = new Bitmap("ObstacleCar", "o_car2.png");
+                break;
+            case 3:
+                _obstacleBitmap = new Bitmap("ObstacleCar", "o_car3.png");
+                break;
+            default:
+                _obstacleBitmap = new Bitmap("ObstacleCar", "o_car3.png");
+                break;
+        }
+    }
     public void Update()
     {
         _y += _speed;
         if (_y > _gameWindow.Height)
         {
             _y = -_obstacleBitmap.Height;
-            Random rnd = new Random();
+            // Random rnd = new Random();
             _x = rnd.Next(200, _gameWindow.Width - _obstacleBitmap.Width-200);
         }
     }

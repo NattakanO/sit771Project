@@ -7,10 +7,24 @@ public class Car
     private int _x, _y;
     private int _fuel;
 
-    public Car(Window gameWindow)
+    public Car(Window gameWindow, String carType)
     {
         _gameWindow = gameWindow;
-        _carBitmap = new Bitmap("Car", "car.png");
+        switch (carType)
+        {
+            case "Black":
+                _carBitmap = new Bitmap("BlackCar", "black_car.png");
+                break;
+            case "Pink":
+                _carBitmap = new Bitmap("PinkCar", "pink_car.png");
+                break;
+            case "Red":
+                _carBitmap = new Bitmap("RedCar", "red_car.png");
+                break;
+            case "White":
+                _carBitmap = new Bitmap("WhiteCar", "white_car.png");
+                break;
+        }
         _x = (gameWindow.Width - _carBitmap.Width) / 2;
         _y = gameWindow.Height - _carBitmap.Height - 10;
         _fuel = 100;

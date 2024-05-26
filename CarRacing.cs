@@ -7,16 +7,18 @@ public class CarRacing
     private Window _gameWindow;
     private List<ObstacleCar> _obstacles;
     private List<Fuel> _fuels;
+    private Bitmap _checkpoints;
     private SplashKitSDK.Timer _timeRemaining;
     private bool _gameOver;
     private Bitmap _background;
     private int _score;
+    private const int InitialTime = 15;
 
-    public CarRacing(Window gameWindow)
+    public CarRacing(Window gameWindow, String carType)
     {
         _gameWindow = gameWindow ?? throw new ArgumentNullException(nameof(gameWindow), "Game window cannot be null");
         _background = new Bitmap("background", "bg1.png");
-        _car = new Car(gameWindow);
+        _car = new Car(gameWindow, carType);
         _obstacles = new List<ObstacleCar>();
         _fuels = new List<Fuel>();
         _timeRemaining = SplashKit.CreateTimer("game_timer");
@@ -24,7 +26,7 @@ public class CarRacing
         _gameOver = false;
         _score = 0;
 
-        for (int i = 0; i < 1; i++)
+        for (int i = 0; i < 2; i++)
         {
             _obstacles.Add(new ObstacleCar(gameWindow));
             _fuels.Add(new Fuel(gameWindow));
@@ -64,6 +66,22 @@ public class CarRacing
                 break; // Exit loop after refueling
             }
         }
+
+        // foreach (var checkpoint in _checkpoints)
+        // {
+        //     checkpoint.Update();
+        //     if (_car.CollidedWithCheckpoint(checkpoint))
+        //     {
+        //         SplashKit.ResetTimer(_timeRemaining);
+        //         _score += 50; // Increase score when checkpoint is reached
+        //         _checkpoints.Remove(checkpoint); 
+        //         break; 
+        //     }
+        // }
+        if (SplashKit.TimerTicks(_timeRemaining) / 1000 > InitialTime)
+        {
+            _gameOver = true;
+        }
     }
 
     public void Draw()
@@ -87,8 +105,10 @@ public class CarRacing
 
     public void DrawStatus()
     {
+        int timeLeft = InitialTime - (int)(SplashKit.TimerTicks(_timeRemaining) / 1000);
         SplashKit.DrawText("SCORE: " + _score, Color.Black, "Arial", 20, _gameWindow.Width - 100, 10);
         SplashKit.DrawText("Fuel: " + _car.Fuel, Color.Black, "Arial", 20, _gameWindow.Width - 100, 30);
+        SplashKit.DrawText("Time: " + timeLeft, Color.Black, "Arial", 20, _gameWindow.Width - 100, 50);
     }
 
     public bool IsGameOver()
