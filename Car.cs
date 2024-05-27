@@ -26,8 +26,8 @@ public class Car
                 break;
         }
         _x = (gameWindow.Width - _carBitmap.Width) / 2;
-        _y = gameWindow.Height - _carBitmap.Height - 10;
-        _fuel = 100;
+        _y = gameWindow.Height - _carBitmap.Height - 20;
+        _fuel = 15;
     }
 
     public int Fuel{
@@ -68,6 +68,10 @@ public class Car
         return _carBitmap.BitmapCollision(_x, _y, fuel.Bitmap, fuel.X, fuel.Y);
     }
 
+    public bool CollidedWithCheckpoint(Checkpoint _checkpoint)
+    {
+        return _carBitmap.BitmapCollision(_x, _y, _checkpoint.Bitmap, _checkpoint.X, _checkpoint.Y);
+    }
     public void Refuel(int amount)
     {
         Fuel += amount;
