@@ -1,36 +1,40 @@
 using SplashKitSDK;
-
-
 public class CarRacing
 {
     private Car _car;
     private Window _gameWindow;
     private List<ObstacleCar> _obstacles;
     private List<Fuel> _fuels;
-    private Bitmap _checkpoints;
     private SplashKitSDK.Timer _timeRemaining;
+    private SplashKitSDK.Timer _obstacleTimer;
+    private SplashKitSDK.Timer _fuelTimer;
     private bool _gameOver;
+    private String _gameOverText;
     private Bitmap _background;
     private int _score;
+    private int _obstacleSpawnInterval;
+    private int _fuelSpawnInterval;
+    private Bitmap _gameoverBitmap;
     private const int InitialTime = 15;
 
-    public CarRacing(Window gameWindow, String carType)
+    public CarRacing(Window gameWindow, string carType)
     {
-        _gameWindow = gameWindow ?? throw new ArgumentNullException(nameof(gameWindow), "Game window cannot be null");
+        _gameWindow = gameWindow;
         _background = new Bitmap("background", "bg1.png");
         _car = new Car(gameWindow, carType);
         _obstacles = new List<ObstacleCar>();
         _fuels = new List<Fuel>();
         _timeRemaining = SplashKit.CreateTimer("game_timer");
+        _obstacleTimer = SplashKit.CreateTimer("obstacle_timer");
+        _fuelTimer = SplashKit.CreateTimer("fuel_timer");
         SplashKit.StartTimer(_timeRemaining);
+        SplashKit.StartTimer(_obstacleTimer);
+        SplashKit.StartTimer(_fuelTimer);
         _gameOver = false;
         _score = 0;
-
-        for (int i = 0; i < 2; i++)
-        {
-            _obstacles.Add(new ObstacleCar(gameWindow));
-            _fuels.Add(new Fuel(gameWindow));
-        }
+        _obstacleSpawnInterval = 2000; // Initial spawn interval
+        _fuelSpawnInterval = 5000;
+        _gameOverText = "";
     }
 
     public void HandleInput()
@@ -40,48 +44,86 @@ public class CarRacing
 
     public void Update()
     {
-        _car.StayOnWindow(_gameWindow);
+        if(_gameOverText != ""){
+            switch (_gameOverText)
+            {
+                case "Time out":
+                _gameoverBitmap = new Bitmap("gameover", "time_out.png");
+                break;
+                case "Game over":
+                _gameoverBitmap = new Bitmap("gameover", "game_over.png");
+                break;
+                default:
+                break;
+            }
+        
+        SplashKit.CurrentWindow().DrawBitmap(_gameoverBitmap,0,0);
+        _gameWindow.Refresh(60);
+        SplashKit.Delay(2000);
+        _gameOver = true;
+      }else{
+         _car.StayOnWindow(_gameWindow);
+
+        // Spawn a new obstacle car at regular intervals
+        if (SplashKit.TimerTicks(_obstacleTimer) > _obstacleSpawnInterval )
+        {
+            _obstacles.Add(new ObstacleCar(_gameWindow));
+            SplashKit.ResetTimer(_obstacleTimer);
+        }
+        if (SplashKit.TimerTicks(_fuelTimer) > _fuelSpawnInterval )
+        {
+            _fuels.Add(RandomFuel());
+            SplashKit.ResetTimer(_fuelTimer);
+        }
+
         foreach (var obstacle in _obstacles)
         {
             obstacle.Update();
-            if(obstacle.Speed < 15){
+            if (obstacle.Speed < 15 && SplashKit.TimerTicks(_obstacleTimer) > _obstacleSpawnInterval)
+            {
                 obstacle.Speed += 1;
+                _obstacleSpawnInterval = 2000 + (obstacle.Speed * 500); 
             }
-            
+
             if (_car.CollidedWithCar(obstacle))
             {
-                _gameOver = true;
-                break; // Exit loop if game over
+                _gameOverText = "Game over";
+                break; 
             }
         }
+        _obstacles.RemoveAll(o => o.Y > _gameWindow.Height); 
 
         foreach (var fuel in _fuels)
         {
             fuel.Update();
             if (_car.CollidedWithFuel(fuel))
             {
-                _car.Refuel();
-                _score += 10; // Increase score when fuel is collected
-                _fuels.Remove(fuel); // Remove the collected fuel
-                break; // Exit loop after refueling
+                _car.Refuel(fuel.RefuelAmount());
+                _score += 10;
+                _fuels.Remove(fuel);
+                break; 
             }
         }
+        _fuels.RemoveAll(f => f.Y > _gameWindow.Height);
 
-        // foreach (var checkpoint in _checkpoints)
-        // {
-        //     checkpoint.Update();
-        //     if (_car.CollidedWithCheckpoint(checkpoint))
-        //     {
-        //         SplashKit.ResetTimer(_timeRemaining);
-        //         _score += 50; // Increase score when checkpoint is reached
-        //         _checkpoints.Remove(checkpoint); 
-        //         break; 
-        //     }
-        // }
         if (SplashKit.TimerTicks(_timeRemaining) / 1000 > InitialTime)
         {
-            _gameOver = true;
+            _gameOverText = "Time out";
         }
+      }
+       
+    }
+    public Fuel RandomFuel(){
+      Fuel fuelSmall = new FuelSmall(_gameWindow);
+      Fuel fuelLarge = new FuelLarge(_gameWindow);
+      float rnd = SplashKit.Rnd()*100;
+      Console.WriteLine(rnd);
+      if(rnd <= 50){
+        return fuelSmall;
+      }
+      else {
+        return fuelLarge;
+      }
     }
 
     public void Draw()
@@ -120,4 +162,5 @@ public class CarRacing
     {
         return _car.Quit();
     }
+
 }
