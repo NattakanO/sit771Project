@@ -38,13 +38,13 @@ public class Car
     {
         if (SplashKit.KeyDown(KeyCode.LeftKey) && _x > 0)
         {
-            _x -= 5;
+            _x -= 7;
         }
         if (SplashKit.KeyDown(KeyCode.RightKey) && _x < _gameWindow.Width - _carBitmap.Width)
         {
-            _x += 5;
+            _x += 7;
         }
-        // if (SplashKit.KeyDown(KeyCode.EscapeKey)) _quit = true;
+        
     }
 
     public void StayOnWindow(Window gameWindow)
@@ -68,9 +68,9 @@ public class Car
         return _carBitmap.BitmapCollision(_x, _y, fuel.Bitmap, fuel.X, fuel.Y);
     }
 
-    public void Refuel()
+    public void Refuel(int amount)
     {
-        _fuel += 10;
+        Fuel += amount;
     }
 
     public bool Quit()
